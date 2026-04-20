@@ -1,0 +1,38 @@
+.chat-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+.chat-placeholder {
+  text-align: center;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+.chat-placeholder p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .chat-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .chat-placeholder {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-container {
+    padding: 1rem;
+  }
+
+  .chat-placeholder {
+    font-size: 0.9rem;
+  }
+}
