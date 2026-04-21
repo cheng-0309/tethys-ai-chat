@@ -8,17 +8,18 @@
   font-size: 1.5rem;
   flex-shrink: 0;
   margin: 0 0.5rem;
-  background-color: #f0f4ff;
-  border: 2px solid #667eea;
+  background-color: var(--color-bg-tertiary);
+  border: 2px solid var(--color-accent);
   overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .avatar-user {
-  background-color: #dbeafe;
+  background-color: var(--color-bg-tertiary);
 }
 
 .avatar-ai {
-  background-color: #f0f4ff;
+  background-color: var(--color-bg-tertiary);
   padding: 0;
 }
 

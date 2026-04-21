@@ -1,0 +1,126 @@
+/* ========================================
+   TETHYS DESIGN SYSTEM - THEME VARIABLES
+   ======================================== */
+
+:root {
+  /* Light Theme */
+  --color-bg-primary: #f5f7fb;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #eef2f7;
+  
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  
+  --color-border: #e5e7eb;
+  --color-shadow: rgba(0, 0, 0, 0.08);
+  
+  --color-message-user: #4f6bed;
+  --color-message-ai: #e5e7eb;
+  
+  --color-header-start: #667eea;
+  --color-header-end: #764ba2;
+  
+  --color-accent: #667eea;
+  --color-accent-hover: #5568d3;
+  
+  --color-button-bg: #f3f4f6;
+  --color-button-border: #d1d5db;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #111827;
+  --color-bg-tertiary: #1f2937;
+  
+  --color-text-primary: #e5e7eb;
+  --color-text-secondary: #d1d5db;
+  --color-text-tertiary: #9ca3af;
+  
+  --color-border: #2d3748;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  
+  --color-message-user: #4f6bed;
+  --color-message-ai: #1f2937;
+  
+  --color-header-start: #1e293b;
+  --color-header-end: #0f172a;
+  
+  --color-accent: #667eea;
+  --color-accent-hover: #5568d3;
+  
+  --color-button-bg: #2d3748;
+  --color-button-border: #4b5563;
+}
+
+/* ========================================
+   SPACING SCALE
+   ======================================== */
+
+:root {
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+}
+
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+}
+
+/* ========================================
+   BORDER RADIUS
+   ======================================== */
+
+:root {
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+}
+
+/* ========================================
+   SHADOWS
+   ======================================== */
+
+:root {
+  --shadow-sm: 0 1px 2px var(--color-shadow);
+  --shadow-md: 0 2px 8px var(--color-shadow);
+  --shadow-lg: 0 4px 12px var(--color-shadow);
+}
+
+/* ========================================
+   TRANSITIONS
+   ======================================== */
+
+:root {
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}

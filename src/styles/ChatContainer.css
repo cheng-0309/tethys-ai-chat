@@ -2,7 +2,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
   overflow: hidden;
+  background-color: var(--color-bg-primary);
+  transition: background-color 0.3s ease;
 }
 
 .messages-area {
@@ -12,9 +15,9 @@
   display: flex;
   flex-direction: column;
   scroll-behavior: smooth;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
 }
 
 /* Scrollbar styling */
@@ -27,18 +30,18 @@
 }
 
 .messages-area::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: var(--color-border);
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 .messages-area::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
+  background-color: var(--color-text-tertiary);
 }
 
 /* Firefox scrollbar */
 .messages-area {
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--color-border) transparent;
   scrollbar-width: thin;
 }
 
@@ -50,7 +53,7 @@
   justify-content: center;
   height: 100%;
   text-align: center;
-  color: #9ca3af;
+  color: var(--color-text-tertiary);
 }
 
 .empty-state-icon {
@@ -61,15 +64,17 @@
 
 .empty-state h2 {
   font-size: 1.5rem;
-  color: #374151;
+  color: var(--color-text-primary);
   margin: 0 0 0.5rem 0;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  transition: color 0.3s ease;
 }
 
 .empty-state p {
   font-size: 1rem;
   margin: 0;
-  color: #9ca3af;
+  color: var(--color-text-tertiary);
+  transition: color 0.3s ease;
 }
 
 @media (max-width: 768px) {

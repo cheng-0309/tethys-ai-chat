@@ -7,7 +7,7 @@
 .typing-indicator span {
   width: 8px;
   height: 8px;
-  background-color: #9ca3af;
+  background-color: var(--color-text-tertiary);
   border-radius: 50%;
   animation: bounce 1.4s infinite;
 }

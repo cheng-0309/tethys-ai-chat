@@ -1,19 +1,34 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import '../styles/InputBox.css';
 
 const InputBox = React.memo(({ onSendMessage, onClearChat, disabled = false }) => {
   const [input, setInput] = useState('');
-  const inputRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const autoResize = useCallback((el) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }, []);
+
+  const handleChange = (e) => {
+    setInput(e.target.value);
+    autoResize(e.target);
+  };
 
   const handleSend = () => {
     if (input.trim()) {
       onSendMessage(input);
       setInput('');
-      inputRef.current?.focus();
+      // Reset textarea height after sending
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+      textareaRef.current?.focus();
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -23,16 +38,16 @@ const InputBox = React.memo(({ onSendMessage, onClearChat, disabled = false }) =
   return (
     <div className="input-box">
       <div className="input-wrapper">
-        <input
-          ref={inputRef}
-          type="text"
+        <textarea
+          ref={textareaRef}
           className="message-input"
           placeholder="Type your message..."
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
           disabled={disabled}
           aria-label="Message input"
+          rows={1}
         />
         <button
           className="send-button"
