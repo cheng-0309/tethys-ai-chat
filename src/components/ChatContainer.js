@@ -4,6 +4,7 @@ import InputBox from './InputBox';
 import TypingIndicator from './TypingIndicator';
 import SkeletonLoader from './SkeletonLoader';
 import ErrorMessage from './ErrorMessage';
+import { sendMessageToAI } from '../services/api';
 import '../styles/ChatContainer.css';
 
 function ChatContainer() {
@@ -18,18 +19,18 @@ function ChatContainer() {
     const loadMessages = async () => {
       try {
         setIsLoading(true);
-        // Simulate loading delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         const initialMessages = [
-          { id: 1, text: 'Hello', sender: 'user', timestamp: '10:30 AM', status: 'read' },
-          { id: 2, text: 'Hi, how can I help you?', sender: 'ai', timestamp: '10:30 AM', status: 'read' },
-          { id: 3, text: 'Can you help me with React?', sender: 'user', timestamp: '10:31 AM', status: 'read' },
-          { id: 4, text: 'Of course! I\'d be happy to help with React. What would you like to know?', sender: 'ai', timestamp: '10:31 AM', status: 'read' },
-          { id: 5, text: 'How do I use hooks?', sender: 'user', timestamp: '10:32 AM', status: 'read' },
-          { id: 6, text: 'React Hooks are functions that let you use state and other React features in functional components. The most common ones are useState and useEffect.', sender: 'ai', timestamp: '10:33 AM', status: 'read' },
+          {
+            id: 1,
+            text: "Hey there! I'm Tethys, your AI assistant. Ask me anything — I'm here to help.",
+            sender: 'ai',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'read',
+          },
         ];
-        
+
         setMessages(initialMessages);
         setIsLoading(false);
       } catch (err) {
@@ -42,14 +43,17 @@ function ChatContainer() {
     const savedMessages = localStorage.getItem('chatMessages');
     if (savedMessages) {
       try {
-        setMessages(JSON.parse(savedMessages));
-        setIsLoading(false);
+        const parsed = JSON.parse(savedMessages);
+        if (parsed.length > 0) {
+          setMessages(parsed);
+          setIsLoading(false);
+          return;
+        }
       } catch {
-        loadMessages();
+        // Fall through to load defaults
       }
-    } else {
-      loadMessages();
     }
+    loadMessages();
   }, []);
 
   // Save messages to localStorage
@@ -64,12 +68,12 @@ function ChatContainer() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const handleSendMessage = (text) => {
-    if (!text.trim()) return;
+  const handleSendMessage = async (text) => {
+    if (!text.trim() || isTyping) return;
 
-    // Add user message
+    // Add user message immediately
     const userMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text,
       sender: 'user',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -78,20 +82,38 @@ function ChatContainer() {
 
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
-
-    // Simulate AI typing and response
+    setError(null);
     setIsTyping(true);
-    setTimeout(() => {
+
+    try {
+      // Send to AI with full conversation history for context
+      const aiResponseText = await sendMessageToAI(text, updatedMessages);
+
       const aiMessage = {
-        id: updatedMessages.length + 1,
-        text: 'This is a demo response. Real AI integration coming soon!',
+        id: Date.now() + 1,
+        text: aiResponseText,
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: 'read',
       };
+
       setMessages(prev => [...prev, aiMessage]);
+    } catch (err) {
+      console.error('AI API error:', err);
+      setError('Something went wrong. Please try again.');
+
+      // Add a fallback AI message so the conversation doesn't look broken
+      const fallbackMessage = {
+        id: Date.now() + 1,
+        text: "I'm sorry, I couldn't process your request right now. Please try again in a moment.",
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        status: 'read',
+      };
+      setMessages(prev => [...prev, fallbackMessage]);
+    } finally {
       setIsTyping(false);
-    }, 2000);
+    }
   };
 
   const handleDismissError = () => {
@@ -148,7 +170,11 @@ function ChatContainer() {
           </>
         )}
       </div>
-      <InputBox onSendMessage={handleSendMessage} onClearChat={handleClearChat} />
+      <InputBox
+        onSendMessage={handleSendMessage}
+        onClearChat={handleClearChat}
+        disabled={isTyping}
+      />
     </main>
   );
 }
