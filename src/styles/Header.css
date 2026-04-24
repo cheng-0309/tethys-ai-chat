@@ -1,9 +1,15 @@
 .header {
-  background: linear-gradient(135deg, var(--color-header-start) 0%, var(--color-header-end) 100%);
-  color: white;
-  padding: 1.25rem 1.5rem;
-  box-shadow: var(--shadow-md);
-  transition: background 0.3s ease;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: var(--glass-border);
+  color: var(--color-header-text);
+  padding: 1rem 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: all var(--transition-normal);
 }
 
 .header-content {
