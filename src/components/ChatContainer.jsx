@@ -20,6 +20,11 @@ import '../styles/ChatContainer.css';
 function ChatContainer({ initialMessages = [], onMessagesChange }) {
   const messagesEndRef = useRef(null);
 
+  // Capture initial prop values in refs so the mount-only effect
+  // can reference them without them being listed as changing dependencies.
+  const initialLengthRef = useRef(initialMessages.length);
+  const onMessagesChangeRef = useRef(onMessagesChange);
+
   // Start with the messages passed in from App.jsx
   // (these are the saved messages for this chat session)
   const [messages, setMessages] = useState(initialMessages);
@@ -28,9 +33,8 @@ function ChatContainer({ initialMessages = [], onMessagesChange }) {
   const [isTyping, setIsTyping] = useState(false);
 
   // ── On first load of a NEW (empty) chat, show the welcome message ──
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (initialMessages.length === 0) {
+    if (initialLengthRef.current === 0) {
       const timer = setTimeout(() => {
         const welcomeMsg = {
           id: Date.now(),
@@ -41,13 +45,13 @@ function ChatContainer({ initialMessages = [], onMessagesChange }) {
         };
         const initial = [welcomeMsg];
         setMessages(initial);
-        onMessagesChange?.(initial); // save to App state
+        onMessagesChangeRef.current?.(initial); // save to App state
         setIsLoading(false);
       }, 500);
 
       return () => clearTimeout(timer); // cleanup if component unmounts early
     }
-  }, []); // run once on mount
+  }, []); // intentionally run once on mount — values captured in refs above
 
   // ── Whenever messages change, notify App so it can save to localStorage ──
   const updateMessages = (newMessages) => {
