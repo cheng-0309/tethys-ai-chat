@@ -1,3 +1,13 @@
+/*
+  ChatContainer.jsx — The main chat window.
+
+  Changes from the original version:
+  - Now receives two props from App.jsx:
+      initialMessages   : the messages already saved for this chat
+      onMessagesChange  : called whenever messages change so App can save them
+  - Removed the old localStorage logic (App.jsx handles that now)
+*/
+
 import React, { useState, useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import InputBox from './InputBox';
@@ -7,71 +17,54 @@ import ErrorMessage from './ErrorMessage';
 import { sendMessageToAI } from '../services/api';
 import '../styles/ChatContainer.css';
 
-function ChatContainer() {
+function ChatContainer({ initialMessages = [], onMessagesChange }) {
   const messagesEndRef = useRef(null);
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // Start with the messages passed in from App.jsx
+  // (these are the saved messages for this chat session)
+  const [messages, setMessages] = useState(initialMessages);
+  const [isLoading, setIsLoading] = useState(initialMessages.length === 0);
   const [error, setError] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
 
-  // Load initial messages on mount
+  // ── On first load of a NEW (empty) chat, show the welcome message ──
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const initialMessages = [
-          {
-            id: 1,
-            text: "Hey there! I'm Tethys, your AI assistant. Ask me anything — I'm here to help.",
-            sender: 'ai',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            status: 'read',
-          },
-        ];
-
-        setMessages(initialMessages);
+    if (initialMessages.length === 0) {
+      const timer = setTimeout(() => {
+        const welcomeMsg = {
+          id: Date.now(),
+          text: "Hey there! I'm Tethys, your AI assistant. Ask me anything — I'm here to help.",
+          sender: 'ai',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: 'read',
+        };
+        const initial = [welcomeMsg];
+        setMessages(initial);
+        onMessagesChange?.(initial); // save to App state
         setIsLoading(false);
-      } catch (err) {
-        setError('Failed to load messages. Please try again.');
-        setIsLoading(false);
-      }
-    };
+      }, 500);
 
-    // Try to load from localStorage first
-    const savedMessages = localStorage.getItem('chatMessages');
-    if (savedMessages) {
-      try {
-        const parsed = JSON.parse(savedMessages);
-        if (parsed.length > 0) {
-          setMessages(parsed);
-          setIsLoading(false);
-          return;
-        }
-      } catch {
-        // Fall through to load defaults
-      }
+      return () => clearTimeout(timer); // cleanup if component unmounts early
     }
-    loadMessages();
-  }, []);
+  }, []); // run once on mount
 
-  // Save messages to localStorage
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('chatMessages', JSON.stringify(messages));
-    }
-  }, [messages]);
+  // ── Whenever messages change, notify App so it can save to localStorage ──
+  const updateMessages = (newMessages) => {
+    setMessages(newMessages);
+    onMessagesChange?.(newMessages);
+  };
 
-  // Auto-scroll to bottom
+  // ── Auto-scroll to the bottom when messages or typing indicator change ──
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  // ── Handle sending a message ──
   const handleSendMessage = async (text) => {
     if (!text.trim() || isTyping) return;
 
-    // Add user message immediately
+    // 1. Add the user's message instantly
     const userMessage = {
       id: Date.now(),
       text,
@@ -81,12 +74,12 @@ function ChatContainer() {
     };
 
     const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    updateMessages(updatedMessages);
     setError(null);
     setIsTyping(true);
 
     try {
-      // Send to AI with full conversation history for context
+      // 2. Ask the AI for a response (pass full history for context)
       const aiResponseText = await sendMessageToAI(text, updatedMessages);
 
       const aiMessage = {
@@ -97,12 +90,12 @@ function ChatContainer() {
         status: 'read',
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      updateMessages([...updatedMessages, aiMessage]);
     } catch (err) {
       console.error('AI API error:', err);
       setError('Something went wrong. Please try again.');
 
-      // Add a fallback AI message so the conversation doesn't look broken
+      // Show a friendly fallback so the chat doesn't look broken
       const fallbackMessage = {
         id: Date.now() + 1,
         text: "I'm sorry, I couldn't process your request right now. Please try again in a moment.",
@@ -110,23 +103,15 @@ function ChatContainer() {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: 'read',
       };
-      setMessages(prev => [...prev, fallbackMessage]);
+      updateMessages([...updatedMessages, fallbackMessage]);
     } finally {
       setIsTyping(false);
     }
   };
 
-  const handleDismissError = () => {
-    setError(null);
-  };
+  const handleDismissError = () => setError(null);
 
-  const handleClearChat = () => {
-    if (window.confirm('Clear all messages?')) {
-      setMessages([]);
-      localStorage.removeItem('chatMessages');
-    }
-  };
-
+  // ── Loading skeleton (shown briefly for new chats) ──
   if (isLoading) {
     return (
       <main className="chat-container">
@@ -143,6 +128,7 @@ function ChatContainer() {
   return (
     <main className="chat-container">
       {error && <ErrorMessage message={error} onDismiss={handleDismissError} />}
+
       <div className="messages-area">
         {messages.length === 0 ? (
           <div className="empty-state">
@@ -166,13 +152,14 @@ function ChatContainer() {
                 <TypingIndicator />
               </div>
             )}
+            {/* Invisible anchor we scroll to */}
             <div ref={messagesEndRef} />
           </>
         )}
       </div>
+
       <InputBox
         onSendMessage={handleSendMessage}
-        onClearChat={handleClearChat}
         disabled={isTyping}
       />
     </main>

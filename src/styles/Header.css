@@ -1,3 +1,4 @@
+/* ── Main header bar ── */
 .header {
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
@@ -18,11 +19,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .header-text {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .header-title {
@@ -39,9 +42,37 @@
   margin-top: 0.125rem;
 }
 
+/* ── Hamburger button: hidden on desktop (sidebar always visible) ── */
+.header-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--color-button-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.header-menu-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* ── Mobile overrides ── */
 @media (max-width: 768px) {
   .header {
     padding: 1rem;
+  }
+
+  /* Show hamburger on mobile */
+  .header-menu-btn {
+    display: flex;
   }
 
   .header-title {
